@@ -1,0 +1,85 @@
+.profile-pic {
+  height: 120px;
+  width: 120px;
+  margin-right: 1rem;
+  border-radius: 50%;
+  border: 4px solid white;
+  overflow: hidden;
+  transform: translateX(0%) translateY(0%);
+  img {
+    box-sizing: border-box;
+    height: 100%;
+    left: 50%;
+    max-height: 100%;
+    position: absolute;
+    transform: translateX(-50%);
+    transition: all 0.15s ease-out;
+    width: auto;
+  }
+  &:hover .image-wrapper {
+    bottom: 0;
+  }
+}
+
+.layer {
+  background-color: rgba(0, 0, 0, 0.25);
+  display: none;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+
+  &.visible {
+    display: block;
+  }
+}
+
+.image-wrapper {
+  background: rgba(0, 0, 0, 0.2);
+  bottom: -50px;
+  height: 50px;
+  left: 0;
+  position: absolute;
+  transition: bottom 0.15s linear;
+  width: 100%;
+}
+
+.hidden-input {
+  left: -999px;
+  position: absolute;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg) translate(-50%);
+  }
+  100% {
+    transform: rotate(360deg) translate(-50%);
+  }
+}
+
+.loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateY(-0%) translateX(-50%);
+  animation: spin 0.35s infinite linear;
+  border: 2px solid #707070;
+  border-radius: 50%;
+  border-top-color: white;
+  height: 25px;
+  transform-origin: left;
+  top: 45%;
+  width: 25px;
+}
+
+.edit {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  cursor: pointer;
+  font-size: 22px;
+  top: 0px;
+}

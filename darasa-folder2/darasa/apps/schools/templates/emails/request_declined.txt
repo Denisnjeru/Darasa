@@ -1,0 +1,8 @@
+Hi {{ first_name }},
+
+Sorry, your request to enroll in course {{ course }} has been declined.
+
+It might be the class is already full.
+
+Kind regards,
+{{ site_name }}

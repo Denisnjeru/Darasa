@@ -1,0 +1,108 @@
+//
+// Input group
+//
+
+.input-group-text {
+  transition: $input-transition;
+}
+
+.input-group {
+  &.input-group-merge {
+    .input-group-text {
+      color: $input-color;
+      background-color: $white;
+      border: 1px solid $input-border-color;
+    }
+    .form-control {
+      box-shadow: none;
+    }
+    .form-control:not(.form-control-prepend) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      border-right-width: 0;
+      padding-right: 0;
+    }
+    .form-control + .input-group-append {
+      margin-left: -1px;
+    }
+    .form-control:focus + .input-group-prepend .input-group-text,
+    .form-control:focus ~ .input-group-append .input-group-text {
+      border-color: $input-group-addon-focus-border-color;
+    }
+    .form-control-prepend {
+      border-top-right-radius: $input-border-radius;
+      border-bottom-right-radius: $input-border-radius;
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+      border-left: 0;
+      padding-left: 0;
+    }
+    .form-control-prepend + .input-group-prepend {
+      order: -1;
+      margin-right: -1px;
+    }
+    .form-control-prepend + .input-group-prepend > .input-group-text {
+      border-right: 0;
+      border-top-left-radius: $input-border-radius;
+      border-bottom-left-radius: $input-border-radius;
+    }
+    .form-control-append {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      border-right-width: 0;
+      padding-right: 0;
+    }
+
+    &.rounded-pill .form-control:not(.form-control-prepend) {
+      border-top-left-radius: 50rem;
+      border-bottom-left-radius: 50rem;
+    }
+
+    &.rounded-pill .form-control + .input-group-append > .input-group-text {
+      border-top-right-radius: 50rem;
+      border-bottom-right-radius: 50rem;
+    }
+
+    &.rounded-pill .form-control-prepend {
+      border-top-right-radius: 50rem;
+      border-bottom-right-radius: 50rem;
+    }
+    &.rounded-pill .form-control-prepend + .input-group-prepend > .input-group-text {
+      border-top-left-radius: 50rem;
+      border-bottom-left-radius: 50rem;
+    }
+  }
+}
+
+// Flush
+
+.input-group-flush {
+  .form-control,
+  .input-group-text {
+    border: 0 !important;
+  }
+}
+
+// Focused state
+
+.focused {
+  // Add shadow on the input group (not on .form-control)
+  .input-group {
+    @if $enable-shadows {
+      box-shadow: $input-box-shadow, $input-focus-box-shadow;
+    } @else {
+      box-shadow: $input-focus-box-shadow;
+    }
+
+    .form-control {
+      box-shadow: none !important;
+    }
+  }
+
+  // Additional styles for the input addon element
+  .input-group-text {
+    color: $input-group-addon-focus-color;
+    background-color: $input-group-addon-focus-bg;
+    border-color: $input-group-addon-focus-border-color;
+  }
+}

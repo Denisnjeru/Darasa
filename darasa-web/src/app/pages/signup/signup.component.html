@@ -1,0 +1,405 @@
+<!-- Main content -->
+<section class="main-content">
+  <div class="container d-flex flex-column">
+    <div class="row align-items-center justify-content-center min-vh-100">
+      <div class="col-md-8 py-6 py-md-0">
+        <div class="card shadow zindex-100 mb-0" style="min-width: 400px;">
+          <div class="card-body px-md-5 py-5">
+            <app-account-card [email]="sf.email.value || tf.email.value"
+              *ngIf="confirmationLinkSent; else showSignUpForm">
+            </app-account-card>
+            <ng-template #showSignUpForm>
+              <div class="mb-3 text-center">
+                <h6 class="h3 text-primary">Darasa LMS</h6>
+                <p class="text-muted mb-0">
+                  Please fill in the fields and click sign up to create your account.
+                </p>
+                <div class="underline bg-primary mx-auto mt-3"></div>
+              </div>
+              <span class="clearfix"></span>
+              <ul class="nav nav-pills d-flex justify-content-center mt-4">
+                <li class="nav-item">
+                  <a class="nav-link nav-link-blue active" id="student-tab" data-toggle="tab" href="#student" role="tab"
+                    aria-controls="student" aria-selected="true">I'm a Student</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link nav-link-blue" id="teacher-tab" data-toggle="tab" href="#teacher" role="tab"
+                    aria-controls="teacher" aria-selected="false">I'm a Teacher</a>
+                </li>
+              </ul>
+              <div class="mt-3" *ngFor="let alert of alerts">
+                <ngb-alert [type]="alert.type" *ngIf="!alert.closed" (close)="closeAlert(alert)">
+                  {{ alert.message }}
+                </ngb-alert>
+              </div>
+              <div class="tab-content">
+                <div class="tab-pane fade show active" id="student" role="tabpanel" aria-labelledby="student-tab">
+                  <form [formGroup]="studentForm" (ngSubmit)="onStudentSubmit()" class="mt-4" autocomplete="off">
+                    <div class="row justify-content-center">
+                      <div class="col-lg-6">
+                        <div class="form-group">
+                          <div class="position-relative w-100">
+                            <div class="position-relative">
+                              <i-feather name="user" class="left-icon position-absolute"
+                                [ngClass]="{ 'text-danger': (studentSubmitted || sf.first_name.touched) && sf.first_name.invalid}">
+                              </i-feather>
+                              <input type="text" formControlName="first_name" class="form-control bg-white px-5 "
+                                placeholder="First name"
+                                [ngClass]="{ 'is-invalid': (studentSubmitted || sf.first_name.touched) && sf.first_name.invalid}">
+                            </div>
+                            <small
+                              *ngIf="(studentSubmitted || sf.first_name.touched) && sf.first_name.hasError('required')"
+                              class="form-text text-danger">
+                              First name is required
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-lg-6">
+                        <div class="form-group">
+                          <div class="position-relative w-100">
+                            <div class="position-relative">
+                              <i-feather name="user" class="left-icon position-absolute"
+                                [ngClass]="{ 'text-danger': (studentSubmitted || sf.last_name.touched) && sf.last_name.invalid}">
+                              </i-feather>
+                              <input type="text" formControlName="last_name" class="form-control bg-white pl-5 "
+                                placeholder="Last name"
+                                [ngClass]="{ 'is-invalid': (studentSubmitted || sf.last_name.touched) && sf.last_name.invalid}">
+                            </div>
+                            <small
+                              *ngIf="(studentSubmitted || sf.last_name.touched) && sf.last_name.hasError('required')"
+                              class="form-text text-danger">
+                              Last name is required
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row justify-content-center">
+                      <div class="col-lg-12">
+                        <div class="form-group">
+                          <ng-select [items]="levels" #selectLevel bindLabel="name" dropdownPosition="auto"
+                            bindValue="id" placeholder="What's your level?" [virtualScroll]="true" [multiple]="false"
+                            formControlName="level" [ngClass]="{'is-invalid': studentSubmitted && sf.level.invalid}">
+                            <ng-template ng-option-tmp let-item="item">
+                              <span>{{ item?.name }}</span>
+                            </ng-template>
+                          </ng-select>
+                          <small *ngIf="studentSubmitted && sf.level.invalid" class="form-text text-danger">
+                            <span *ngIf="sf.level.errors.required">Level is required</span>
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row justify-content-center">
+                      <div class="col-lg-12">
+                        <div class=form-group>
+                          <div class="position-relative ">
+                            <div class="position-relative">
+                              <i-feather name="mail" class="left-icon position-absolute"
+                                [ngClass]="{ 'text-danger': (studentSubmitted || sf.email.touched) && sf.email.invalid}">
+                              </i-feather>
+                              <input type="email" formControlName="email" class="form-control bg-white pl-5 "
+                                placeholder="Email"
+                                [ngClass]="{ 'is-invalid': (studentSubmitted || sf.email.touched) && sf.email.invalid}">
+                            </div>
+                            <small *ngIf="(studentSubmitted || sf.email.touched) && sf.email.hasError('required')"
+                              class="form-text text-danger">
+                              Email is required
+                            </small>
+                            <small *ngIf="(studentSubmitted || sf.email.touched) && sf.email.hasError('email')"
+                              class="form-text text-danger">
+                              Not a valid email
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row justify-content-center">
+                      <div class="col-lg-6">
+                        <div class="form-group">
+                          <div class="position-relative w-100">
+                            <div class="position-relative">
+                              <i-feather name="lock" class="left-icon position-absolute"
+                                [ngClass]="{ 'text-danger': (studentSubmitted || sf.password.touched) && sf.password.invalid}">
+                              </i-feather>
+                              <input [type]="studentPasswordVisible ? 'text' : 'password'" formControlName="password"
+                                class="form-control bg-white px-5 " placeholder="Password"
+                                [ngClass]="{ 'is-invalid': (studentSubmitted || sf.password.touched) && sf.password.invalid}" />
+                              <i-feather [name]="studentPasswordVisible ? 'eye' : 'eye-off'"
+                                class="right-icon position-absolute" (click)="toggleStudentsPassword()"
+                                [ngClass]="{ 'text-danger': (studentSubmitted || sf.password.touched) && sf.password.invalid}">
+                              </i-feather>
+                            </div>
+                            <small *ngIf="(studentSubmitted || sf.password.touched) && sf.password.hasError('required')"
+                              class="form-text text-danger">
+                              Password is required
+                            </small>
+                            <small *ngIf="(studentSubmitted || sf.password.dirty) && sf.password.hasError('minlength')"
+                              class="form-text text-danger">
+                              Must be at least 8 characters!
+                            </small>
+                            <small *ngIf="(studentSubmitted || sf.password.dirty) && sf.password.hasError('hasNumber')"
+                              class="form-text text-danger">
+                              Must contain at least 1 number!
+                            </small>
+                            <small
+                              *ngIf="(studentSubmitted || sf.password.dirty) && sf.password.hasError('hasCapitalCase')"
+                              class="form-text text-danger">
+                              Must contain at least 1 in Capital Case!
+                            </small>
+                            <small
+                              *ngIf="(studentSubmitted || sf.password.dirty) && sf.password.hasError('hasSmallCase')"
+                              class="form-text text-danger">
+                              Must contain at least 1 Letter in Small Case!
+                            </small>
+                            <small
+                              *ngIf="(studentSubmitted || sf.password.dirty) && sf.password.hasError('hasSpecialCharacters')"
+                              class="form-text text-danger">
+                              Must contain at least 1 Special Character!
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-lg-6">
+                        <div class="form-group">
+                          <div class="position-relative w-100">
+                            <div class="position-relative">
+                              <i-feather name="lock" class="left-icon position-absolute"
+                                [ngClass]="{'text-danger': (studentSubmitted || sf.repeatPassword.touched) && sf.repeatPassword.hasError('NoPassswordMatch')}">
+                              </i-feather>
+                              <input [type]="studentRepeatPasswordVisible ? 'text' : 'password'"
+                                formControlName="repeatPassword" class="form-control bg-white px-5 "
+                                placeholder="Repeat password"
+                                [ngClass]="{'is-invalid': (studentSubmitted || sf.repeatPassword.touched) && sf.repeatPassword.hasError('NoPassswordMatch')}">
+                              <i-feather [name]="studentRepeatPasswordVisible ? 'eye' : 'eye-off'"
+                                class="right-icon position-absolute" (click)="toggleStudentRepeatPassword()"
+                                [ngClass]="{'text-danger': (studentSubmitted || sf.repeatPassword.touched) && sf.repeatPassword.hasError('NoPassswordMatch')}">
+                              </i-feather>
+                            </div>
+                            <small *ngIf="sf.repeatPassword.dirty && sf.repeatPassword.hasError('NoPassswordMatch')"
+                              class="form-text text-danger">
+                              The password does not match
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12 d-flex justify-content-between align-items-center">
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" formControlName="accept_terms" class="custom-control-input"
+                          id="student-accept-terms">
+                        <label class="custom-control-label" for="student-accept-terms">
+                          Accept <a [routerLink]="['/terms-and-privacy']">Terms of use and Privacy</a>
+                        </label>
+                      </div>
+                      <button type="submit" class="btn btn-primary">
+                        <span *ngIf="postingStudent" class="spinner-border spinner-border-sm" role="status"
+                          aria-hidden="true"></span>
+                        Sign up
+                      </button>
+                    </div>
+                  </form>
+                </div>
+                <div class="tab-pane fade" id="teacher" role="tabpanel" aria-labelledby="teacher-tab">
+                  <form [formGroup]="teacherForm" (ngSubmit)="onTeacherSubmit()" class="mt-4" autocomplete="off">
+                    <div class="row justify-content-center">
+                      <div class="col-6">
+                        <div class="form-group">
+                          <div class="position-relative w-100">
+                            <div class="position-relative">
+                              <i-feather name="user" class="left-icon position-absolute"
+                                [ngClass]="{ 'text-danger': (teacherSubmitted || tf.first_name.touched) && tf.first_name.invalid}">
+                              </i-feather>
+                              <input type="text" formControlName="first_name" class="form-control bg-white px-5 "
+                                placeholder="First name"
+                                [ngClass]="{ 'is-invalid': (teacherSubmitted || tf.first_name.touched) && tf.first_name.invalid}">
+                            </div>
+                            <small
+                              *ngIf="(teacherSubmitted || tf.first_name.touched) && tf.first_name.hasError('required')"
+                              class="form-text text-danger">
+                              First name is required
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="form-group">
+                          <div class="position-relative w-100">
+                            <div class="position-relative">
+                              <i-feather name="user" class="left-icon position-absolute"
+                                [ngClass]="{ 'text-danger': (teacherSubmitted || tf.last_name.touched) && tf.last_name.invalid}">
+                              </i-feather>
+                              <input type="text" formControlName="last_name" class="form-control bg-white pl-5 "
+                                placeholder="Last name"
+                                [ngClass]="{ 'is-invalid': (teacherSubmitted || tf.last_name.touched) && tf.last_name.invalid}">
+                            </div>
+                            <small
+                              *ngIf="(teacherSubmitted || tf.last_name.touched) && tf.last_name.hasError('required')"
+                              class="form-text text-danger">
+                              Last name is required
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row justify-content-center">
+                      <div class="col-12">
+                        <div class="form-group">
+                          <ng-select [items]="titles" #selectTitle bindLabel="name" dropdownPosition="auto"
+                            bindValue="id" placeholder="What's your title?" [virtualScroll]="true" [multiple]="false"
+                            formControlName="title" [ngClass]="{'is-invalid': teacherSubmitted && tf.title.invalid}">
+                            <ng-template ng-option-tmp let-item="item">
+                              <span>{{ item?.name }}</span>
+                            </ng-template>
+                          </ng-select>
+                          <small *ngIf="teacherSubmitted && tf.title.invalid" class="form-text text-danger">
+                            <span *ngIf="tf.title.errors.required">Title is required</span>
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row justify-content-center">
+                      <div class="col-12">
+                        <div class=form-group>
+                          <div class="position-relative">
+                            <div class="position-relative">
+                              <i-feather name="mail" class="left-icon position-absolute"
+                                [ngClass]="{ 'text-danger': (teacherSubmitted || tf.email.touched) && tf.email.invalid}">
+                              </i-feather>
+                              <input type="email" formControlName="email" class="form-control bg-white pl-5 "
+                                placeholder="Email"
+                                [ngClass]="{ 'is-invalid': (teacherSubmitted || tf.email.touched) && tf.email.invalid}">
+                            </div>
+                            <small *ngIf="(teacherSubmitted || tf.email.touched) && tf.email.hasError('required')"
+                              class="form-text text-danger">
+                              Email is required
+                            </small>
+                            <small *ngIf="(teacherSubmitted || tf.email.touched) && tf.email.hasError('email')"
+                              class="form-text text-danger">
+                              Not a valid email
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row justify-content-center">
+                      <div class="col-6">
+                        <div class="form-group">
+                          <div class="position-relative w-100">
+                            <div class="position-relative">
+                              <i-feather name="lock" class="left-icon position-absolute"
+                                [ngClass]="{ 'text-danger': (teacherSubmitted || tf.password.touched) && tf.password.invalid}">
+                              </i-feather>
+                              <input [type]="teacherPasswordVisible ? 'text' : 'password'" formControlName="password"
+                                class="form-control bg-white px-5 " placeholder="Password"
+                                [ngClass]="{ 'is-invalid': (teacherSubmitted || tf.password.touched) && tf.password.invalid}">
+                              <i-feather [name]="teacherPasswordVisible ? 'eye' : 'eye-off'"
+                                class="right-icon position-absolute" (click)="toggleTeacherPassword()"
+                                [ngClass]="{ 'text-danger': (teacherSubmitted || tf.password.touched) && tf.password.invalid}">
+                              </i-feather>
+                            </div>
+                            <small *ngIf="(teacherSubmitted || tf.password.touched) && tf.password.hasError('required')"
+                              class="form-text text-danger">
+                              Password is required
+                            </small>
+                            <small *ngIf="(teacherSubmitted || tf.password.dirty) && tf.password.hasError('minlength')"
+                              class="form-text text-danger">
+                              Must be at least 8 characters!
+                            </small>
+                            <small *ngIf="(teacherSubmitted || tf.password.dirty) && tf.password.hasError('hasNumber')"
+                              class="form-text text-danger">
+                              Must contain at least 1 number!
+                            </small>
+                            <small
+                              *ngIf="(teacherSubmitted || tf.password.dirty) && tf.password.hasError('hasCapitalCase')"
+                              class="form-text text-danger">
+                              Must contain at least 1 in Capital Case!
+                            </small>
+                            <small
+                              *ngIf="(teacherSubmitted || tf.password.dirty) && tf.password.hasError('hasSmallCase')"
+                              class="form-text text-danger">
+                              Must contain at least 1 Letter in Small Case!
+                            </small>
+                            <small
+                              *ngIf="(teacherSubmitted || tf.password.dirty) && tf.password.hasError('hasSpecialCharacters')"
+                              class="form-text text-danger">
+                              Must contain at least 1 Special Character!
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-6">
+                        <div class="form-group">
+                          <div class="position-relative w-100">
+                            <div class="position-relative">
+                              <i-feather name="lock" class="left-icon position-absolute"
+                                [ngClass]="{'text-danger': (teacherSubmitted || tf.repeatPassword.touched) && tf.repeatPassword.hasError('NoPassswordMatch')}">
+                              </i-feather>
+                              <input [type]="studentRepeatPasswordVisible ? 'text' : 'password'"
+                                formControlName="repeatPassword" class="form-control bg-white px-5 "
+                                placeholder="Repeat password"
+                                [ngClass]="{'is-invalid': (teacherSubmitted || tf.repeatPassword.touched) && tf.repeatPassword.hasError('NoPassswordMatch')}">
+                              <i-feather [name]="studentRepeatPasswordVisible ? 'eye' : 'eye-off'"
+                                class="right-icon position-absolute" (click)="toggleStudentRepeatPassword()"
+                                [ngClass]="{'text-danger': (teacherSubmitted || tf.repeatPassword.touched) && tf.repeatPassword.hasError('NoPassswordMatch')}">
+                              </i-feather>
+                            </div>
+                            <small *ngIf="tf.repeatPassword.dirty && tf.repeatPassword.hasError('NoPassswordMatch')"
+                              class="form-text text-danger">
+                              The password does not match
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row" *ngIf="allowTeacherVerification">
+                      <div class="col-12">
+                        <div class=form-group>
+                          <div class="position-relative">
+                            <input type="file" id="el-certificate" (change)="fileChosen($event)"
+                              class="custom-input-file" accept="application/msword, application/vnd.ms-excel, application/vnd.ms-powerpoint,
+                              text/plain, application/pdf, image/*" />
+                            <label for="el-certificate" class="form-control"
+                              [ngClass]="{'is-invalid': (teacherSubmitted) && tf.certificate?.invalid}">
+                              <i-feather name="upload" class="text-muted"></i-feather>
+                              <span class="text-muted">{{ tf.certificate?.value?.name || 'Upload certification'}}</span>
+                            </label>
+                            <small *ngIf="(teacherSubmitted) && tf.certificate.hasError('required')"
+                              class="form-text text-danger">
+                              Certification is required
+                            </small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-12 d-flex justify-content-between align-items-center">
+                        <div class="custom-control custom-checkbox">
+                          <input type="checkbox" formControlName="accept_terms" class="custom-control-input"
+                            id="teacher-accept-terms">
+                          <label class="custom-control-label" for="teacher-accept-terms">
+                            Accept <a [routerLink]="['/terms-and-privacy']">Terms of use and Privacy</a>
+                          </label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                          <span *ngIf="postingTeacher" class="spinner-border spinner-border-sm" role="status"
+                            aria-hidden="true"></span>
+                          Sign up
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+        <div class="float-left py-3" *ngIf="!confirmationLinkSent">
+          Already have an account?
+          <a [routerLink]="['/login']" class="font-weight-bold"> Sign In</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

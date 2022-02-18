@@ -1,0 +1,306 @@
+<section class="main-content" *ngIf="course?.id">
+  <h4 class="d-flex align-items-center">
+    <a [routerLink]="['/courses']" class="go-back">
+      <i-feather name="arrow-left"></i-feather>
+    </a>
+    {{ course?.name }}
+  </h4>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="cover-container mb-4 text-center">
+            <img alt="" src="{{ course?.cover }}" class="img-fluid rounded">
+          </div>
+          <ngb-tabset [destroyOnHide]="false" [justify]="'justified'">
+            <ngb-tab title="Course Overview">
+              <ng-template ngbTabContent>
+                <div class="m-3">
+                  <p>
+                    <span class="mr-1">Teacher:</span>
+                    <span class="text-primary">
+                      {{ course?.teacher?.user?.title ? course?.teacher?.user?.title + '.' : '' }}
+                      {{ course?.teacher?.user?.first_name | titlecase }}
+                      {{ course.teacher.user?.last_name | titlecase }}
+                    </span>
+                  </p>
+                  <p *ngIf="course?.assistant_teachers?.length > 0">
+                    <span class="mr-1">Assistant teachers:</span>
+                    <span class="text-primary" *ngFor="let teacher of course?.assistant_teachers; let i = index">
+                      &nbsp;{{ teacher?.user?.first_name }} {{ teacher.user?.last_name }}&nbsp;
+                      {{ course?.assistant_teachers?.length > 1 && i !== course?.assistant_teachers?.length - 1 ? '|' :
+                      '' }}
+                    </span>
+                  </p>
+                  <app-students-avatar-group [students]="course?.students"></app-students-avatar-group>
+                  <p class="mt-3">
+                    <app-read-more [content]="course?.description" [limit]="300" [completeWords]="true"></app-read-more>
+                  </p>
+                </div>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="Lessons">
+              <ng-template ngbTabContent>
+                <p class="m-3" *ngIf="course?.lessons?.length <= 0; else showLessons">
+                  No lessons found
+                </p>
+                <ng-template #showLessons>
+                  <ol class="m-3">
+                    <ng-container *ngFor="let lesson of course?.lessons | orderByImpure:['position']">
+                      <li class="mb-3" *ngIf="!lesson?.parent_lesson">
+                        <span class="h6" [ngClass]="{'btn-link': lesson?.description || lesson?.notes}"
+                          style="cursor: pointer;" data-toggle="collapse"
+                          [attr.data-target]="'#collapseLesson'+lesson?.id" aria-expanded="false"
+                          [attr.aria-controls]="'#collapseLesson'+lesson?.id" *ngIf="!lesson?.parent_lesson">
+                          {{ lesson?.name }}
+                        </span>
+                        <span class="badge text-danger float-right" style="cursor: pointer;"
+                          (click)="deleteLesson(lesson?.id)" *ngIf="user?.role === 'teacher'">
+                          <i-feather name="trash-2"></i-feather>
+                        </span>
+                        <span class="badge text-primary float-right" *ngIf="lesson?.notes">
+                          <i-feather name="download-cloud"></i-feather>
+                        </span>
+                        <div class="collapse" id="collapseLesson{{ lesson?.id }}"
+                          *ngIf="lesson?.description || lesson?.notes">
+                          <div class="card card-body mt-3">
+                            <div class="d-flex">
+                              <p class="col-10 text-small">
+                                <app-read-more [content]="lesson?.description" [limit]="300" [completeWords]="true">
+                                </app-read-more>
+                              </p>
+                              <a href="{{ lesson?.notes }}" target="_blank" class="col-2 text-sm text-center"
+                                *ngIf="lesson?.notes">
+                                <img src="../../../../assets/img/files/{{ lesson?.notes?.slice(-3) }}.png"
+                                  style="width: 48px;" /><br />
+                                Download
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                        <ol *ngIf="lesson?.children_lessons?.length">
+                          <li class="mb-3" *ngFor="let child_lesson of lesson?.children_lessons | orderBy:['position']">
+                            <span class="h6" [ngClass]="{'btn-link': child_lesson?.description || child_lesson?.notes}"
+                              style="cursor: pointer;" data-toggle="collapse"
+                              [attr.data-target]="'#collapseLesson'+child_lesson?.id" aria-expanded="false"
+                              [attr.aria-controls]="'#collapseLesson'+child_lesson?.id">
+                              {{ child_lesson?.name }}
+                            </span>
+                            <span class="badge text-danger float-right" style="cursor: pointer;"
+                              (click)="deleteLesson(child_lesson?.id)" *ngIf="user?.role === 'teacher'">
+                              <i-feather name="trash-2"></i-feather>
+                            </span>
+                            <span class="badge text-primary float-right" *ngIf="child_lesson?.notes">
+                              <i-feather name="download-cloud"></i-feather>
+                            </span>
+                            <div class="collapse" id="collapseLesson{{ child_lesson?.id }}"
+                              *ngIf="child_lesson?.description || child_lesson?.notes">
+                              <div class="card card-body mt-3">
+                                <div class="d-flex">
+                                  <p class="col-10 text-small">
+                                    <app-read-more [content]="child_lesson?.description" [limit]="300"
+                                      [completeWords]="true"></app-read-more>
+                                  </p>
+                                  <a href="{{ child_lesson?.notes }}" target="_blank" class="col-2 text-sm text-center"
+                                    *ngIf="child_lesson?.notes">
+                                    <img src="../../../../assets/img/files/{{ child_lesson?.notes?.slice(-3) }}.png"
+                                      style="width: 48px;" /><br />
+                                    Download
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                        </ol>
+                      </li>
+                    </ng-container>
+                  </ol>
+                </ng-template>
+                <button type="button" class="btn btn-sm btn-soft-primary m-3" (click)="addLesson()"
+                  *ngIf="user?.role === 'teacher'">
+                  Add Lesson
+                </button>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="FAQ">
+              <ng-template ngbTabContent>
+                <p class="m-3"
+                  *ngIf="(course?.posts | filterByImpure: ['category']: 'faq').length <= 0; else showFAQPosts">
+                  No frequently asked questions
+                </p>
+                <ng-template #showFAQPosts>
+                  <ul class="accordion accordion-spaced m-3 p-0">
+                    <ng-container *ngFor="let post of course?.posts | filterByImpure: ['category']: 'faq'">
+                      <li class="card" *ngIf="!post?.parent_post">
+                        <div class="card-header py-3">
+                          <h6 class="btn-link" style="cursor: pointer;" data-toggle="collapse"
+                            [attr.data-target]="'#collapseFaq'+post?.id" aria-expanded="false"
+                            [attr.aria-controls]="'#collapseFaq'+post?.id">
+                            {{ post?.name }}
+                            <span class="badge text-danger float-right" style="cursor: pointer; padding-right: 1rem;"
+                              (click)="deletePost(post?.id)" *ngIf="user?.role === 'teacher'">
+                              <i-feather name="trash-2"></i-feather>
+                            </span>
+                          </h6>
+                        </div>
+                        <div class="collapse" id="collapseFaq{{ post?.id }}">
+                          <div class="card-body">
+                            <p class="text-small">
+                              <app-read-more [content]="post?.description" [limit]="300" [completeWords]="true">
+                              </app-read-more>
+                            </p>
+                            <ul class="accordion accordion-spaced m-0 p-0" *ngIf="post?.children_posts?.length">
+                              <li class="card"
+                                *ngFor="let child_post of post?.children_posts | filterByImpure: ['category']: 'faq'">
+                                <div class="card-header py-2">
+                                  <h6 class="btn-link" style="cursor: pointer;" data-toggle="collapse"
+                                    [attr.data-target]="'#collapseFaq'+child_post?.id" aria-expanded="false"
+                                    [attr.aria-controls]="'#collapseFaq'+child_post?.id">
+                                    {{ child_post?.name }}
+                                    <span class="badge text-danger float-right"
+                                      style="cursor: pointer; padding-right: 1rem;" (click)="deletePost(child_post?.id)"
+                                      *ngIf="user?.role === 'teacher'">
+                                      <i-feather name="trash-2"></i-feather>
+                                    </span>
+                                  </h6>
+                                </div>
+                                <div class="collapse" id="collapseFaq{{ child_post?.id }}">
+                                  <div class="card-body">
+                                    <p class="text-small">
+                                      <app-read-more [content]="child_post?.description" [limit]="300"
+                                        [completeWords]="true"></app-read-more>
+                                    </p>
+                                  </div>
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </li>
+                    </ng-container>
+                  </ul>
+                </ng-template>
+                <button type="button" class="btn btn-sm btn-soft-primary m-3" (click)="addPost('faq')"
+                  *ngIf="user?.role === 'teacher'">
+                  Add FAQ
+                </button>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="Anouncements">
+              <ng-template ngbTabContent>
+                <p class="m-3"
+                  *ngIf="(course?.posts | filterByImpure: ['category']: 'announcement').length <= 0; else showAnnouncementPosts">
+                  No announcements
+                </p>
+                <ng-template #showAnnouncementPosts>
+                  <ul class="accordion accordion-spaced m-3 p-0">
+                    <ng-container *ngFor="let post of course?.posts | filterByImpure: ['category']: 'announcement'">
+                      <li class="card" *ngIf="!post?.parent_post">
+                        <div class="card-header py-3">
+                          <h6 class="btn-link" style="cursor: pointer;" data-toggle="collapse"
+                            [attr.data-target]="'#collapseAnnouncement'+post?.id" aria-expanded="false"
+                            [attr.aria-controls]="'#collapseAnnouncement'+post?.id">
+                            {{ post?.name }}
+                            <span class="badge text-danger float-right" style="cursor: pointer; padding-right: 1rem;"
+                              (click)="deletePost(post?.id)" *ngIf="user?.role === 'teacher'">
+                              <i-feather name="trash-2"></i-feather>
+                            </span>
+                          </h6>
+                          <span class="text-muted text-sm">{{ post?.date_created | date:'mediumDate' }}</span>
+                        </div>
+                        <div class="collapse" id="collapseAnnouncement{{ post?.id }}">
+                          <div class="card-body">
+                            <p class="text-small">
+                              <app-read-more [content]="post?.description" [limit]="300" [completeWords]="true">
+                              </app-read-more>
+                            </p>
+                            <ul class="accordion accordion-spaced m-0 p-0" *ngIf="post?.children_posts?.length">
+                              <li class="card"
+                                *ngFor="let child_post of post?.children_posts | filterByImpure: ['category']: 'announcement'">
+                                <div class="card-header py-2">
+                                  <h6 class="btn-link" style="cursor: pointer;" data-toggle="collapse"
+                                    [attr.data-target]="'#collapseAnnouncement'+child_post?.id" aria-expanded="false"
+                                    [attr.aria-controls]="'#collapseAnnouncement'+child_post?.id">
+                                    {{ child_post?.name }}
+                                    <span class="badge text-danger float-right"
+                                      style="cursor: pointer; padding-right: 1rem;" (click)="deletePost(child_post?.id)"
+                                      *ngIf="user?.role === 'teacher'">
+                                      <i-feather name="trash-2"></i-feather>
+                                    </span>
+                                  </h6>
+                                  <span class="text-muted text-sm">
+                                    {{ child_post?.date_created | date:'mediumDate' }}
+                                  </span>
+                                </div>
+                                <div class="collapse" id="collapseAnnouncement{{ child_post?.id }}">
+                                  <div class="card-body">
+                                    <p class="text-small">
+                                      <app-read-more [content]="child_post?.description" [limit]="300"
+                                        [completeWords]="true"></app-read-more>
+                                    </p>
+                                  </div>
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                      </li>
+                    </ng-container>
+                  </ul>
+                </ng-template>
+                <button type="button" class="btn btn-sm btn-soft-primary m-3" (click)="addPost('announcement')"
+                  *ngIf="user?.role === 'teacher'">
+                  Add Announcement
+                </button>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="{{ user?.role === 'student' ? 'Classmates' : 'Students'}}">
+              <ng-template ngbTabContent>
+                <p class="m-3" *ngIf="course?.students.length <= 0; else showStudents">
+                  No student has joined this course.
+                </p>
+                <ng-template #showStudents>
+                  <ul class="list-group m-3">
+                    <li class="list-group-item" *ngFor="let student of course?.students; let i = index">
+                      <img alt="" src="{{ student.user.picture }}" class="avatar avatar-lg float-right">
+                      <h6 class="mb-0">{{ i+1 }}. {{ student?.user.first_name | titlecase }}
+                        {{ student?.user.last_name | titlecase }}</h6>
+                      <p class="text-small mb-0">{{ student?.user?.gender | titlecase }}</p>
+                      <p class="text-small mb-0 text-primary">{{ student?.level?.name | titlecase }}</p>
+                    </li>
+                  </ul>
+                </ng-template>
+              </ng-template>
+            </ngb-tab>
+          </ngb-tabset>
+        </div>
+        <div class="col-lg-4">
+          <button type="button" class="btn btn-icon btn-primary w-100 mb-3"
+            *ngIf="user?.role === 'teacher'; else showEnrollCourseButton" (click)="addClass()">
+            <i-feather name="file-plus"></i-feather>
+            Add Class
+          </button>
+          <ng-template #showEnrollCourseButton>
+            <button type="button" class="btn btn-icon w-100 mb-3" [ngClass]="{
+              'btn-primary': !submittedRequest || !requestedCourse,
+              'btn-success': submittedRequest || requestedCourse}" *ngIf="!joinedCourse" (click)="enrollCourse()">
+              <i-feather name="check" *ngIf="submittedRequest || requestedCourse">
+              </i-feather>
+              <i-feather name="user-plus" *ngIf="!(submittedRequest || requestedCourse)">
+              </i-feather>
+              {{ submittedRequest || requestedCourse ? 'Submitted Request' : 'Enroll Course' }}
+            </button>
+          </ng-template>
+          <h6>Classes <span class="badge badge-secondary float-right">{{ course?.classrooms?.length }}</span></h6>
+          <p *ngIf="course?.classrooms?.length <= 0; else showClasses">No classes exist for this course. Add a class
+            above.</p>
+          <ng-template #showClasses>
+            <app-classroom-card [classroom]="classroom" [index]="i"
+              *ngFor="let classroom of course?.classrooms; let i = index">
+            </app-classroom-card>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

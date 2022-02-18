@@ -1,0 +1,31 @@
+<section class="main-content">
+  <div class="row">
+    <div class="col-6">
+      <h4>My Courses</h4>
+    </div>
+    <div class="col-6">
+      <a [routerLink]="['/courses/add']" class="btn btn-icon btn-primary float-right">
+        <i-feather name="folder-plus"></i-feather>
+        Add Course
+      </a>
+      <a [routerLink]="['/courses/recommended']" class="btn btn-icon btn-secondary float-right mr-3" *ngIf="profile?.role === 'student'">
+        <i-feather name="heart"></i-feather>
+        Recommended
+      </a>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <p class="col-12" *ngIf="enrolledCourses?.length <= 0; else showEnrolledCourses">
+      Not created a course yet
+    </p>
+    <ng-template #showEnrolledCourses>
+      <div style="margin: 0 10px;" *ngFor="let course of enrolledCourses">
+        <app-course-card [course]="course"></app-course-card>
+      </div>
+      <div class="col-12">
+        <ngb-pagination [collectionSize]="collectionSize" [(page)]="page" [pageSize]="pageSize"
+          (pageChange)="getUserEnrolledCourses()" aria-label="Courses pagination"></ngb-pagination>
+      </div>
+    </ng-template>
+  </div>
+</section>

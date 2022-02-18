@@ -1,0 +1,76 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="editprofileModalLabel">Edit Profile</h4>
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="modal-body">
+    <div *ngIf="alerts.length > 0">
+      <div *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type" *ngIf="!alert.closed" (close)="closeAlert(alert)">
+          {{ alert.message }}
+        </ngb-alert>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-control-label">Title</label>
+      <ng-select [items]="titles" #selectTitle dropdownPosition="auto" bindValue="id" bindLabel="name"
+        placeholder="What's your title?" [virtualScroll]="true" [multiple]="false" formControlName="title">
+        <ng-template ng-option-tmp let-item="item">
+          <span>{{ item?.name }}</span>
+        </ng-template>
+      </ng-select>
+    </div>
+    <div class="form-group">
+      <label class="form-control-label">First names</label>
+      <input type="text" formControlName="first_name" class="form-control"
+        [ngClass]="{'is-invalid': submitted && f.first_name.invalid}" />
+      <div *ngIf="submitted && f.first_name.invalid" class="form-text text-danger">
+        <span *ngIf="f.first_name.errors.required">First names are required</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-control-label">Surname</label>
+      <input type="text" formControlName="last_name" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label class="form-control-label">Display name</label>
+      <input type="text" formControlName="nickname" class="form-control" />
+      <small>
+        This could be your first name, or a nickname — however you’d like people to refer to you.
+      </small>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-control-label">Gender</label>
+          <ng-select [items]="genders" #selectGender dropdownPosition="auto" bindValue="value" bindLabel="name"
+            placeholder="Select gender" [virtualScroll]="true" [multiple]="false" formControlName="gender">
+            <ng-template ng-option-tmp let-item="item">
+              <span>{{ item?.name }}</span>
+            </ng-template>
+          </ng-select>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-control-label">Phone number</label>
+          <input type="tel" formControlName="phone" class="form-control" placeholder="(123) 456-7890" pattern="([0-9]{3}) [0-9]{3}-[0-9]{4}" />
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-control-label">Time zone</label>
+      <ng-select [items]="timezones" #selectTimezone dropdownPosition="auto" bindValue="value" bindLabel="name"
+        placeholder="Select timezone" [virtualScroll]="true" [multiple]="false" formControlName="timezone">
+        <ng-template ng-option-tmp let-item="item">
+          <span>{{ item?.name }}</span>
+        </ng-template>
+      </ng-select>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary">Save changes</button>
+  </div>
+</form>

@@ -1,0 +1,9 @@
+<ng-container *ngIf="content.length > 0">
+  {{ content }}
+  <span class="text-primary" style="cursor: pointer;" *ngIf="!isContentToggled && content.length > limit" (click)="toggleContent()" i18n>
+    Read More
+  </span>
+  <span class="text-primary" style="cursor: pointer;" *ngIf="isContentToggled && content.length > limit" (click)="toggleContent()" i18n>
+    Read Less
+  </span>
+</ng-container>

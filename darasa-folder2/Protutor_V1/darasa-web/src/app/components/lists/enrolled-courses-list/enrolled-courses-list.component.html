@@ -1,0 +1,15 @@
+<div class="row">
+  <div class="col-12">
+    <h4>Enrolled Courses</h4>
+    <div class="row flex-row flex-nowrap mt-3" style="overflow-x: auto;">
+      <p class="col-12" *ngIf="enrolledCourses?.length <= 0 && !loadingUserCourses; else showEnrolledCourses">
+        You are not enrolled to any course. See recommended section.
+      </p>
+      <ng-template #showEnrolledCourses>
+        <div class="mr-3" *ngFor="let course of enrolledCourses">
+          <app-course-card [course]="course"></app-course-card>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

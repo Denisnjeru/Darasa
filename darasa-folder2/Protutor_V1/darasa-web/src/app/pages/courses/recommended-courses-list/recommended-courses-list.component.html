@@ -1,0 +1,27 @@
+<section class="main-content">
+  <div class="row d-flex align-items-center">
+    <div class="col-md-6 col-sm-12">
+      <h4 class="m-0">Recommended Courses</h4>
+    </div>
+    <div class="col-md-6">
+      <select class="custom-select float-right" style="width: unset;" [(ngModel)]="selectedLevel"
+        (change)="getUserRecommendedCourses(selectedLevel)">
+        <option selected value="0">All</option>
+        <option [value]="level?.id" *ngFor="let level of levels">{{ level?.name }}</option>
+      </select>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="col-md-12 d-flex">
+      <div class="spinner-border text-primary" role="status" *ngIf="loadingCourses">
+        <span class="sr-only">Loading...</span>
+      </div>
+      <p *ngIf="!loadingCourses && recommendedCourses?.length <= 0; else showRecommendedCourses">
+        There are no matching courses.
+      </p>
+      <ng-template #showRecommendedCourses>
+        <app-course-card [course]="course" *ngFor="let course of recommendedCourses"></app-course-card>
+      </ng-template>
+    </div>
+  </div>
+</section>

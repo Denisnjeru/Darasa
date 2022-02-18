@@ -1,0 +1,73 @@
+<section class="main-content">
+  <div class="pt-4">
+    <div class="row">
+      <div class="col-md-6 col-sm-12">
+        <div class="d-flex align-items-center">
+          <div class="profile-pic">
+            <img [src]="pictureURL" alt="My picture" class="mr-3">
+            <div class="layer" [ngClass]="{'visible':submitted}">
+              <div class="loader"></div>
+            </div>
+            <span class="image-wrapper">
+              <input type="file" class="hidden-input" id="changePicture" (change)="fileChosen($event)"
+                accept="image/png, image/jpeg" />
+              <label class="edit" for="changePicture"
+                title="Change picture (preferably square dimensions e.g. 256px by 256px)">
+                <i-feather name="edit"></i-feather>
+              </label>
+            </span>
+          </div>
+          <div>
+            <h2 class="user__name h6 text-dark mb-0">{{ user.first_name }} {{ user.last_name}}</h2>
+            <p class="user__class small text-primary mb-0">
+              {{ user.role === 'student' ? user?.student?.level?.name : user?.teacher?.position }}
+            </p>
+            <p class="user__class small text-muted mb-0">
+              Date joined: {{ user?.date_joined | date:'medium' }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-sm-12 d-flex align-items-center" style="justify-content: flex-end;">
+        <button type="button" class="btn btn-sm btn-soft-primary" (click)="editProfile()">
+          Edit Profile
+        </button>
+      </div>
+    </div>
+    <div class="my-3" *ngIf="user.role === 'student'">
+      <h5>Your Teachers</h5>
+      <div class="avatar-group" *ngIf="courses?.length > 0; else showNoTeachers">
+        <img [src]="course.teacher.user.picture" alt="" class="avatar rounded-circle" placement="bottom"
+          *ngFor="let course of courses.slice(0,10)"
+          ngbPopover="{{ course.teacher.user.first_name }} {{ course.teacher.user.last_name }}"
+          triggers="mouseenter:mouseleave">
+        <span class="avatar avatar-xs bg-primary text-white rounded-circle" *ngIf="courses?.length - 10 > 1">
+          {{ courses?.length - 10 }}
+        </span>
+      </div>
+      <ng-template #showNoTeachers>
+        <p>You have not enrolled to any course yet.</p>
+      </ng-template>
+    </div>
+    <div class="row my-3">
+      <div class="col-6">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">My Courses</h5>
+            <hr class="my-3">
+            <ol class="px-5 pb-0 m-0 pt-0" *ngIf="courses?.length > 0; else showNoCourses">
+              <li *ngFor="let course of courses">
+                <div class="d-flex justify-content-between align-items-center">
+                  <p class="m-0 tex-capitalize">{{ course.name }}</p>
+                </div>
+              </li>
+            </ol>
+            <ng-template #showNoCourses>
+              <p>You have not enrolled to any course yet.</p>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
